@@ -15,6 +15,9 @@ app.use(express.urlencoded())
 app.use(cookieParser())
 app.use(express.static("uploads"))
 
+app.get("/",(res,req)=>{
+    res.status(200).json({message:"workingwell"})
+})
 
 // routes importing 
 
