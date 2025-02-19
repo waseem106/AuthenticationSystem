@@ -5,10 +5,12 @@ import cookieParser from "cookie-parser";
 
 const app=express();
 app.use(cors({
-    origin:process.env.CORS_ORIGIN,
-    credentials:true
- }))
+    origin: 'https://waseem106.github.io',
+    optionsSuccessStatus: 200 // For legacy browser support    
 
+ }))
+//  origin:process.env.CORS_ORIGIN,
+ // credentials:true
 //middlewares
 app.use(express.json())
 app.use(express.urlencoded())
