@@ -1,5 +1,5 @@
 import { User } from "../models/user.model.js";
-import uploadOnCloudinary from "../utils/cloudinary.js";
+// import uploadOnCloudinary from "../utils/cloudinary.js";
 
 const generateAccessAndRefreshToken = async (userId, res) => {
   //generate access and refresh token
