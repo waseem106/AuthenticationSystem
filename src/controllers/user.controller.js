@@ -28,10 +28,10 @@ const generateAccessAndRefreshToken = async (userId, res) => {
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, profilePicture, password, role } = req.body;
+    const { name, email, password, role } = req.body;
 
     if (
-      [name, email, profilePicture, password, role].some(
+      [name, email, password, role].some(
         (field) => field?.trim() === ""
       )
     ) {
@@ -39,54 +39,48 @@ const registerUser = async (req, res) => {
         .status(400)
         .json({ validatingError: "All fields are required" });
     }
+    
     if (!email.includes("@")) {
-      return res.staus(400).json({ emailError: "Enter valid email" });
+      return res.status(400).json({ emailError: "Enter valid email" });
     }
 
     const existedUser = await User.findOne({ email });
     if (existedUser) {
-      return res.status(400).json({ existedUserError: "User existed error" });
+      return res.status(400).json({ existedUserError: "User already exists" });
     }
 
-    const imageUpload = req.file?.path;
-    console.log("image upload path,", imageUpload);
-    const fileType = req.file?.mimetype;
-
-    if (!imageUpload) {
-      return res.status(400).json({ imageUpload: "Multer image not uploaded" });
+    // Get the uploaded image URL from Cloudinary
+    const imageUrl = req.file?.path;
+    if (!imageUrl) {
+      return res.status(400).json({ imageUploadError: "Image not uploaded" });
     }
 
-    const image = await uploadOnCloudinary(imageUpload);
-    if (!image) {
-      return res
-        .status(400)
-        .json({ message: "Image is not uploaded on cloudinary" });
-    }
-
+    // Create user in DB
     const user = await User.create({
       name,
       email,
       password,
       role,
-      profilePicture: image.url,
+      profilePicture: imageUrl,
     });
 
     const createdUser = await User.findById(user._id).select("-password");
 
     if (!createdUser) {
-      return res
-        .status(400)
-        .json({ userRegisterError: "User registration failed" });
+      return res.status(400).json({ userRegisterError: "User registration failed" });
     }
 
     return res.status(200).json({
       message: "User Registered Successfully",
       registeredUser: createdUser,
     });
+
   } catch (error) {
-    res.status(400).json({ registerUserError: "Error while registering user" });
+    console.error("Error:", error);
+    res.status(500).json({ registerUserError: "Internal server error" });
   }
 };
+
 
 const loginUser = async (req, res) => {
   //take data
